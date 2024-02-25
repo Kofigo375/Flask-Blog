@@ -12,7 +12,7 @@ app. config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  ## setting the loc
 db = SQLAlchemy(app)
 
 from models import User, Post
-
+ 
 
 
 posts = [
