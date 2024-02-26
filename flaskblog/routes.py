@@ -2,7 +2,7 @@ from flask import Flask, render_template, url_for, flash, redirect
 from flaskblog import app, db, bcrypt
 from flaskblog.models import User, Post
 from flaskblog.forms import RegistrationForm, LoginForm
-
+from flask_login import login_user,logout_user, current_user
  
 
 
@@ -31,9 +31,13 @@ def home():
 def about():
     return render_template('about.html', title='about')
 
+
 @app.route("/register", methods=['GET', 'POST'])
 def register():
-    ## create an instance of the Registration form
+    # redirecting an already logged in user to the homepage
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    # ## create an instance of the Registration form
     form = RegistrationForm()
     ## checking if form validated after submission
     if  form.validate_on_submit():
@@ -47,14 +51,31 @@ def register():
         return redirect(url_for('login'))  ## user will be returned to login page 
     return render_template('register.html', title='Register', form=form)
 
+
 @app.route("/login", methods=['GET', 'POST'])
 def login():
+    # redirecting an already logged in user to the homepage
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     ## create an instance of the login form
     form = LoginForm()
     if form.validate_on_submit():
-        if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-            flash('You have been logged in!', 'success')
-            return redirect(url_for('home'))
+        # logic for logging a user in 
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, form.password.data):
+            # this will return true if user exists and password in database
+            login_user(user, remember=form.remember.data) # log user in 
+            # redirect to homepage after login 
+            return redirect(url_for('home')) 
         else:
-            flash('Login failed. Please check username and password', 'danger')
+            flash('Login Failed. Please check email and password', 'danger')
     return render_template('login.html', title='login', form=form)
+
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('home')) 
+
+    
+    
