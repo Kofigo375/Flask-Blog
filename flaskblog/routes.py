@@ -1,17 +1,8 @@
-import os
 from flask import Flask, render_template, url_for, flash, redirect
-from forms import RegistrationForm, LoginForm
-from flask_sqlalchemy import SQLAlchemy 
+from flaskblog import app, db, bcrypt
+from flaskblog.models import User, Post
+from flaskblog.forms import RegistrationForm, LoginForm
 
-
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = 'def1b1d4d5bf91e42aa3f6a0cf1bf20b' ## setting a secret key
-app. config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'  ## setting the location of the database
-## creating sqlalchemy database instance
-db = SQLAlchemy(app)
-
-from models import User, Post
  
 
 
@@ -46,8 +37,14 @@ def register():
     form = RegistrationForm()
     ## checking if form validated after submission
     if  form.validate_on_submit():
-        flash(f'Accounted created for {form.username.data}!', 'success')
-        return redirect(url_for('home'))
+        # create  account
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data,email=form.email.data ,password=hashed_password)
+        # add user to the database
+        db.session.add(user)
+        db.session.commit()
+        flash(f'Account created!', 'success')
+        return redirect(url_for('login'))  ## user will be returned to login page 
     return render_template('register.html', title='Register', form=form)
 
 @app.route("/login", methods=['GET', 'POST'])
@@ -61,11 +58,3 @@ def login():
         else:
             flash('Login failed. Please check username and password', 'danger')
     return render_template('login.html', title='login', form=form)
-
-## if we want to run this script with python directly
-if __name__ == '__main__':
-    app.run(debug=True)
-
-## two ways of runing flask apps 
-## 1. set environment variables
-## 2. including app.run in main app script

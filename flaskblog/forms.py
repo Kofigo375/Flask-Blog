@@ -1,8 +1,10 @@
 from flask_wtf import FlaskForm
 ## this module will help us use python classes to write html forms 
 
+from flaskblog.models import User
+
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 
 ## creating a sign up form
 class RegistrationForm(FlaskForm): 
@@ -15,6 +17,20 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password',
                                      validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Sign Up')
+    
+    ## this method(is our own custom validator) throws an error if the username already exists
+    def validate_username(self, username): 
+        user = User.query.filter_by(username=username.data).first()
+        if user:
+            raise ValidationError('Username already exist. Please choose a different username')
+            
+    ## this method(is our own custom validator) throws an error if the email already exists
+    def validate_email(self, email): 
+        user = User.query.filter_by(email=email.data).first()
+        if user:
+            raise ValidationError('email already exist. Please choose a different email')
+            
+        
 
 ## creating a log in form
 class LoginForm(FlaskForm): 

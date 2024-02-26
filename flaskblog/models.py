@@ -1,8 +1,13 @@
 from datetime import datetime
-from __main__ import db
+from flaskblog import db, login_manger
+from flask_login import UserMixin
+
+@login_manger.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 ## creating classes which will be tables in our database
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
