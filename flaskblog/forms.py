@@ -1,4 +1,5 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
 ## this module will help us use python classes to write html forms 
 
 from flaskblog.models import User
@@ -50,6 +51,8 @@ class UpdateAccountForm(FlaskForm):
                            validators=[DataRequired(), Length(min=2, max=30)])
     email = StringField('Email',
                         validators=[DataRequired(), Email()])
+    
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
     
     submit = SubmitField('Update')
     
