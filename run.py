@@ -7,3 +7,6 @@ if __name__ == '__main__':
 ## two ways of runing flask apps 
 ## 1. set environment variables
 ## 2. including app.run in main app script
+
+
+## multi select shortcut (ctrl + shft + L) 
