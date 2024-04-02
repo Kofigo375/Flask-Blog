@@ -9,4 +9,9 @@ if __name__ == '__main__':
 ## 2. including app.run in main app script
 
 
-## multi select shortcut (ctrl + shft + L) 
+## multi select all instances of a word shortcut (ctrl + shft + L) 
+## multi select one after the other (ctrl+d)
+
+
+
+
